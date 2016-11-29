@@ -159,18 +159,12 @@ public class DriveSample {
      * Uploads a file using either resumable or direct media upload.
      */
     private static File uploadFile(boolean useDirectUpload) throws IOException {
-        File fileFolderMetadata = new File();
-        fileFolderMetadata.setName("test2");
-        fileFolderMetadata.setMimeType("application/vnd.google-apps.folder");
-
-        File fileFolder = drive.files().create(fileFolderMetadata)
-                .setFields("id")
-                .execute();
-        System.out.println("Folder ID: " + fileFolder.getId());
+//        File fileFolder = createFolder();
 //        String folderId = "0BwwA4oUTeiV1TGRPeTVjaWRDY1E";
         File fileMetadata = new File();
         fileMetadata.setName(UPLOAD_FILE.getName());
-        fileMetadata.setParents(Collections.singletonList(fileFolder.getId()));
+//        fileMetadata.setParents(Collections.singletonList(fileFolder.getId()));
+        fileMetadata.setParents(Collections.singletonList("0B6mR0d58K1yCaGVOSkJvQ3hEY28"));
         fileMetadata.setMimeType("image/jpeg");
 //        fileMetadata.setParents(Collections.singletonList(folderId));
         java.io.File filePath = new java.io.File(UPLOAD_FILE_PATH);
@@ -181,6 +175,18 @@ public class DriveSample {
                 .execute();
         System.out.println("File ID: " + file.getId());
         return file;
+    }
+
+    private static File createFolder() throws IOException {
+        File fileFolderMetadata = new File();
+        fileFolderMetadata.setName("test2");
+        fileFolderMetadata.setMimeType("application/vnd.google-apps.folder");
+
+        File fileFolder = drive.files().create(fileFolderMetadata)
+                .setFields("id")
+                .execute();
+        System.out.println("Folder ID: " + fileFolder.getId());
+        return fileFolder;
     }
 
     /**

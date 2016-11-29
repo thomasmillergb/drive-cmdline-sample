@@ -21,7 +21,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
-import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpTransport;
@@ -61,7 +60,7 @@ public class DriveSample {
      */
     private static final String APPLICATION_NAME = "MyCompany-ProductName/1.0";
 
-    private static final String UPLOAD_FILE_PATH = "E:/dev/driveTest/upload/Test1.txt";
+    private static final String UPLOAD_FILE_PATH = "E:/dev/driveTest/upload/DSC_0128.JPG";
     private static final String DIR_FOR_DOWNLOADS = "E:/dev/driveTest/download/";
     private static final java.io.File UPLOAD_FILE = new java.io.File(UPLOAD_FILE_PATH);
 
@@ -160,16 +159,28 @@ public class DriveSample {
      * Uploads a file using either resumable or direct media upload.
      */
     private static File uploadFile(boolean useDirectUpload) throws IOException {
+        File fileFolderMetadata = new File();
+        fileFolderMetadata.setName("test2");
+        fileFolderMetadata.setMimeType("application/vnd.google-apps.folder");
+
+        File fileFolder = drive.files().create(fileFolderMetadata)
+                .setFields("id")
+                .execute();
+        System.out.println("Folder ID: " + fileFolder.getId());
+//        String folderId = "0BwwA4oUTeiV1TGRPeTVjaWRDY1E";
         File fileMetadata = new File();
-        fileMetadata.setTitle(UPLOAD_FILE.getName());
-
-        FileContent mediaContent = new FileContent("image/jpeg", UPLOAD_FILE);
-
-        Drive.Files.Insert insert = drive.files().insert(fileMetadata, mediaContent);
-        MediaHttpUploader uploader = insert.getMediaHttpUploader();
-        uploader.setDirectUploadEnabled(useDirectUpload);
-        uploader.setProgressListener(new FileUploadProgressListener());
-        return insert.execute();
+        fileMetadata.setName(UPLOAD_FILE.getName());
+        fileMetadata.setParents(Collections.singletonList(fileFolder.getId()));
+        fileMetadata.setMimeType("image/jpeg");
+//        fileMetadata.setParents(Collections.singletonList(folderId));
+        java.io.File filePath = new java.io.File(UPLOAD_FILE_PATH);
+//        FileContent mediaContent = new FileContent("image/jpeg", filePath);
+        FileContent mediaContent = new FileContent("text/jpeg", filePath);
+        File file = drive.files().create(fileMetadata, mediaContent)
+                .setFields("id")
+                .execute();
+        System.out.println("File ID: " + file.getId());
+        return file;
     }
 
     /**
@@ -177,7 +188,7 @@ public class DriveSample {
      */
     private static File updateFileWithTestSuffix(String id) throws IOException {
         File fileMetadata = new File();
-        fileMetadata.setTitle("drivetest-" + UPLOAD_FILE.getName());
+        fileMetadata.setName("drivetest-" + UPLOAD_FILE.getName());
 
         Drive.Files.Update update = drive.files().update(id, fileMetadata);
         return update.execute();
@@ -193,12 +204,12 @@ public class DriveSample {
         if (!parentDir.exists() && !parentDir.mkdirs()) {
             throw new IOException("Unable to create parent directory");
         }
-        OutputStream out = new FileOutputStream(new java.io.File(parentDir, uploadedFile.getTitle()));
+        OutputStream out = new FileOutputStream(new java.io.File(parentDir, uploadedFile.getName()));
 
         MediaHttpDownloader downloader =
                 new MediaHttpDownloader(httpTransport, drive.getRequestFactory().getInitializer());
         downloader.setDirectDownloadEnabled(useDirectDownload);
         downloader.setProgressListener(new FileDownloadProgressListener());
-        downloader.download(new GenericUrl(uploadedFile.getDownloadUrl()), out);
+        downloader.download(new GenericUrl(uploadedFile.getWebContentLink()), out);
     }
 }

@@ -133,17 +133,17 @@ public class DriveSample {
             View.header1("Starting Resumable Media Upload");
             File uploadedFile = uploadFile(false);
 
-            View.header1("Updating Uploaded File Name");
-            File updatedFile = updateFileWithTestSuffix(uploadedFile.getId());
-
-            View.header1("Starting Resumable Media Download");
-            downloadFile(false, updatedFile);
-
-            View.header1("Starting Simple Media Upload");
-            uploadedFile = uploadFile(true);
-
-            View.header1("Starting Simple Media Download");
-            downloadFile(true, uploadedFile);
+//            View.header1("Updating Uploaded File Name");
+//            File updatedFile = updateFileWithTestSuffix(uploadedFile.getId());
+//
+//            View.header1("Starting Resumable Media Download");
+//            downloadFile(false, updatedFile);
+//
+//            View.header1("Starting Simple Media Upload");
+//            uploadedFile = uploadFile(true);
+//
+//            View.header1("Starting Simple Media Download");
+//            downloadFile(true, uploadedFile);
 
             View.header1("Success!");
             return;
